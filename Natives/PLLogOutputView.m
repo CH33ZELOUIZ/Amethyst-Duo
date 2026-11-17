@@ -88,7 +88,7 @@ static PLLogOutputView* current;
     alert.popoverPresentationController.sourceView = cell;
     alert.popoverPresentationController.sourceRect = cell.bounds;
     // Raw single-line sharing could leak tokens/paths, so copying is the only line action; sharing
-    // whole logs goes through the redacted Diagnostics export in private developer builds.
+    // whole logs should not be shared publicly as they may contain sensitive data.
     UIAlertAction *share = [UIAlertAction actionWithTitle:localize(@"duo.log.copy_line", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         UIPasteboard.generalPasteboard.string = line;
     }];

@@ -9,8 +9,7 @@ This fork adds:
 1. **iPhone Duo fold-aware layout** - Game renders on the top half, touch controls on the bottom half when the device is half-folded horizontally. Fully open = fullscreen game.
 2. **Offline modpack import** - Import CurseForge/Modrinth modpacks from local ZIP files with safe extraction, NeoForge/Forge/Fabric installer integration, and transaction-based profile publication.
 3. **Modpack library UI** - Browse, import, and manage installed modpacks from a dedicated packs screen.
-4. **Diagnostics export** - Review and share redacted logs via the system Share Sheet (no server upload).
-5. **Virtual touch-mouse filtering** - iOS 27+ exposes the touchscreen as a virtual GCMouse; this fork ignores it so touch controls stay visible.
+4. **Virtual touch-mouse filtering** - iOS 27+ exposes the touchscreen as a virtual GCMouse; this fork ignores it so touch controls stay visible.
 
 Base: Taylen27's archived fork, which bundles LWJGL 3.4.x + SDL3 + Java 25 (required for Minecraft 1.26.x/NeoForge 27.x).
 

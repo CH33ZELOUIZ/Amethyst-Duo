@@ -539,7 +539,7 @@
 "duo.offline.blocked.hint" = " Raise the Java RAM allocation in Settings > Java (if the device has enough physical RAM), then import again. The temporary copy was removed; your original file is untouched.";
 "duo.log.copy_line" = "Copy line";
 "duo.log.share_title" = "Share logs";
-"duo.log.share_redirect" = "Raw logs are not shared because they can contain tokens and account names. Use Diagnostics > Review & export for a redacted, reviewable report.";
+"duo.log.share_redirect" = "Raw logs are not shared because they can contain tokens and account names.";
 "duo.log.share_unavailable" = "Raw logs are not shared because they can contain tokens and account names. Log export is only available in private developer builds.";
 "duo.settings.curseforge_status_on" = "CurseForge: key saved (Keychain). CurseForge browsing is available.";
 "duo.settings.curseforge_status_off" = "CurseForge: no key saved. CurseForge browsing stays disabled until you add one; Modrinth works without a key.";

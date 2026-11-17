@@ -425,7 +425,7 @@
               @"type": self.typeChildPane, @"class": ModpackInstallViewController.class, @"canDismissWithSwipe": @YES,
               @"enableCondition": whenNotInGame}
         ], @[
-        // Diagnostics and developer settings.
+        // Developer settings
             @{@"icon": @"ladybug"},
             @{@"key": @"debug_always_attached_jit",
                 @"hasDetail": @YES,
