@@ -16,9 +16,13 @@ FOUNDATION_EXPORT NSNotificationName const PLProfilesDidChangeNotification;
 - (id)initWithCurrentInstance;
 - (NSMutableDictionary<NSString *, NSMutableDictionary<NSString *, NSString *> *> *)profiles;
 
+// Profile names sorted case-insensitively; use for any index-based UI (dictionary order is unstable).
+- (NSArray<NSString *> *)sortedProfileNames;
 - (NSMutableDictionary<NSString *, NSString *> *)selectedProfile;
 - (NSString *)selectedProfileName;
 - (void)setSelectedProfileName:(NSString *)name;
+// Callers that publish a profile must use this variant so write failures are not hidden.
+- (BOOL)save:(NSError **)error;
 - (void)save;
 
 @end

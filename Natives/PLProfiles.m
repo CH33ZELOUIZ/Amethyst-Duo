@@ -78,6 +78,10 @@ NSNotificationName const PLProfilesDidChangeNotification = @"PLProfilesDidChange
     return self.profileDict[@"profiles"];
 }
 
+- (NSArray<NSString *> *)sortedProfileNames {
+    return [[self.profiles allKeys] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+}
+
 - (id)selectedProfile {
     return self.profiles[self.selectedProfileName];
 }
@@ -93,7 +97,13 @@ NSNotificationName const PLProfilesDidChangeNotification = @"PLProfilesDidChange
 }
 
 - (void)save {
-    saveJSONToFile(self.profileDict, self.profilePath);
+    [self save:nil];
+}
+
+- (BOOL)save:(NSError **)error {
+    NSError *saveError = saveJSONToFile(self.profileDict, self.profilePath);
+    if (saveError && error) *error = saveError;
+    return saveError == nil;
 }
 
 @end

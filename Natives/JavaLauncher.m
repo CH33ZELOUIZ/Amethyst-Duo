@@ -1,3 +1,5 @@
+#include <limits.h>
+#include <stdlib.h>
 #include <dirent.h>
 #include <dlfcn.h>
 #include <errno.h>
@@ -141,7 +143,8 @@ static BOOL versionHasVulkanBackend(NSString *versionId) {
     return found;
 }
 
-int launchJVM(NSString *username, id launchTarget, int width, int height, int minVersion) {
+static int launchJVMWithJarArguments(NSString *username, id launchTarget, int width, int height,
+                                     int minVersion, NSArray<NSString *> *jarArguments) {
     NSLog(@"[JavaLauncher] Beginning JVM launch");
 
     init_loadDefaultEnv();
@@ -394,7 +397,21 @@ int launchJVM(NSString *username, id launchTarget, int width, int height, int mi
         }
     }
     margv[++margc] = [NSString stringWithFormat:@"-Dpojav.lwjglVersion=%@", lwjgl.folder].UTF8String;
+    // iOS: /var -> /private/var symlink; the sandbox denies lstat("/var"), which breaks
+    // Path.toRealPath(NOFOLLOW_LINKS) (used e.g. by Cobblemon's Showdown). Use the real path.
+    [NSFileManager.defaultManager createDirectoryAtPath:gameDir withIntermediateDirectories:YES attributes:nil error:nil];
+    char resolvedGameDir[PATH_MAX];
+    if (realpath(gameDir.UTF8String, resolvedGameDir) != NULL) {
+        gameDir = @(resolvedGameDir);
+    }
     margv[++margc] = [NSString stringWithFormat:@"-Duser.dir=%@", gameDir].UTF8String;
+    // Keep the process working directory in sync with user.dir (relative NIO/native paths use the cwd)
+    [NSFileManager.defaultManager createDirectoryAtPath:gameDir withIntermediateDirectories:YES attributes:nil error:nil];
+    if (chdir(gameDir.UTF8String) != 0) {
+        NSLog(@"[JavaLauncher] Working directory: chdir to %@ failed (errno %d)", gameDir, errno);
+    } else {
+        NSLog(@"[JavaLauncher] Working directory set to %@", gameDir);
+    }
     margv[++margc] = [NSString stringWithFormat:@"-Duser.home=%s", getenv("AME_HOME")].UTF8String;
     margv[++margc] = [NSString stringWithFormat:@"-Duser.timezone=%@", NSTimeZone.localTimeZone.name].UTF8String;
     margv[++margc] = [NSString stringWithFormat:@"-DUIScreen.maximumFramesPerSecond=%d", (int)UIScreen.mainScreen.maximumFramesPerSecond].UTF8String;
@@ -568,6 +585,9 @@ int launchJVM(NSString *username, id launchTarget, int width, int height, int mi
         margv[++margc] = [launchTarget[@"id"] UTF8String];
     } else {
         margv[++margc] = [launchTarget UTF8String];
+        for (NSString *argument in jarArguments) {
+            margv[++margc] = argument.UTF8String;
+        }
     }
     //margv[++margc] = "ghidra.GhidraRun";
 
@@ -601,4 +621,36 @@ int launchJVM(NSString *username, id launchTarget, int width, int height, int mi
                    "java", "openjdk",
                    /* (const_jargs != NULL) ? JNI_TRUE : */ JNI_FALSE,
                    JNI_TRUE, JNI_FALSE, JNI_TRUE);
+}
+
+int launchJVM(NSString *username, id launchTarget, int width, int height, int minVersion) {
+    return launchJVMWithJarArguments(username, launchTarget, width, height, minVersion, nil);
+}
+
+void launchNeoForgeInstaller(NSString *installerPath, NSString *versionID, NSString *installationDirectory,
+                             void (^completion)(BOOL installed, NSString *errorMessage)) {
+    if (!installerPath.length || !versionID.length || !installationDirectory.length || [versionID containsString:@"/"] || [versionID containsString:@"\\"]) {
+        completion(NO, @"The NeoForge installer request is invalid.");
+        return;
+    }
+
+    NSString *versionJSON = [NSString stringWithFormat:@"%@/versions/%@/%@.json", installationDirectory, versionID, versionID];
+    // A pre-existing version file must never make a no-op installer look successful.
+    if ([NSFileManager.defaultManager fileExistsAtPath:versionJSON]) {
+        completion(NO, @"NeoForge version metadata already exists; install must run in a fresh isolated staging root.");
+        return;
+    }
+    int result = launchJVMWithJarArguments(nil, installerPath, windowWidth, windowHeight, 21,
+                                           @[@"--installClient", installationDirectory]);
+    BOOL outputExists = result == 0 && [NSFileManager.defaultManager fileExistsAtPath:versionJSON];
+    NSDictionary *metadata = outputExists ? [NSJSONSerialization JSONObjectWithData:[NSData dataWithContentsOfFile:versionJSON]
+                                                                           options:0 error:nil] : nil;
+    BOOL installed = [metadata isKindOfClass:NSDictionary.class] && [metadata[@"id"] isEqualToString:versionID] &&
+                     [metadata[@"inheritsFrom"] isKindOfClass:NSString.class] &&
+                     [metadata[@"libraries"] isKindOfClass:NSArray.class];
+    if (!installed) {
+        completion(NO, [NSString stringWithFormat:@"NeoForge %@ did not create valid client version metadata (installer exit code %d).", versionID, result]);
+        return;
+    }
+    completion(YES, nil);
 }
