@@ -12,7 +12,6 @@
 #import "installer/ModrinthModsViewController.h"
 #import "installer/ModpackInstallViewController.h"
 #import "packs/DuoPacksViewController.h"
-#import "diagnostics/DuoDiagnosticsViewController.h"
 #import "tools/AMTools.h"
 #import "PLProfiles.h"
 #import "UIButton+AFNetworking.h"
@@ -92,10 +91,6 @@
         [contentNavigationController performSelector:@selector(enterModInstaller)];
     }]];
     
-#if DUO_PRIVATE_BUILD
-    [self.options addObject:[LauncherMenuCustomItem vcClass:DuoDiagnosticsViewController.class]];
-#endif
-
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     
     self.navigationController.toolbarHidden = NO;

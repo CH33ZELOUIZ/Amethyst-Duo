@@ -17,9 +17,6 @@
 #import "ios_uikit_bridge.h"
 #import "utils.h"
 #import "installer/modpack/CurseForgeAPI.h"
-#if DUO_PRIVATE_BUILD
-#import "diagnostics/DuoDiagnosticsViewController.h"
-#endif
 
 @interface LauncherPreferencesViewController()<UISearchResultsUpdating>
 @property(nonatomic) NSArray<NSString*> *rendererKeys, *rendererList;
@@ -71,11 +68,6 @@
         @[
             // General settings
             @{@"icon": @"cube"},
-#if DUO_PRIVATE_BUILD
-            @{@"key": @"diagnostics", @"title": localize(@"duo.diag.title", nil), @"icon": @"stethoscope",
-              @"type": self.typeChildPane, @"class": DuoDiagnosticsViewController.class,
-              @"canDismissWithSwipe": @YES, @"enableCondition": whenNotInGame},
-#endif
             @{@"key": @"curseforge_api_key", @"icon": @"key", @"type": self.typeButton,
               @"enableCondition": whenNotInGame, @"action": ^void(){ [self editCurseForgeKey]; }},
             @{@"key": @"check_sha",
