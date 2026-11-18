@@ -4,7 +4,6 @@
 #import "LauncherNavigationController.h"
 #import "PLProfiles.h"
 #import "installer/ModpackInstallViewController.h"
-#import "tools/AMTools.h"
 #import "ios_uikit_bridge.h"
 #import "utils.h"
 

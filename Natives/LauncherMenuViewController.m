@@ -12,7 +12,6 @@
 #import "installer/ModrinthModsViewController.h"
 #import "installer/ModpackInstallViewController.h"
 #import "packs/DuoPacksViewController.h"
-#import "tools/AMTools.h"
 #import "PLProfiles.h"
 #import "UIButton+AFNetworking.h"
 #import "UIImageView+AFNetworking.h"

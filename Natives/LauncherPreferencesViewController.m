@@ -10,7 +10,6 @@
 #import "LauncherPrefManageJREViewController.h"
 #import "AccountListViewController.h"
 #import "installer/ModpackInstallViewController.h"
-#import "tools/AMTools.h"
 #import "UIKit+hook.h"
 
 #import "config.h"
