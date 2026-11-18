@@ -1,6 +1,7 @@
 #import "PLLogOutputView.h"
 #import "SurfaceViewController.h"
 #import "utils.h"
+#import "ios_uikit_bridge.h"
 #include "config.h"
 
 @interface PLLogOutputView()<UITableViewDataSource, UITableViewDelegate>
