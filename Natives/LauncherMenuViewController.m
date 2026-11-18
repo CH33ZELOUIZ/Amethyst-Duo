@@ -72,9 +72,6 @@
         [LauncherMenuCustomItem vcClass:ModrinthModsViewController.class],
         [LauncherMenuCustomItem vcClass:LauncherResourcePacksViewController.class],
         [LauncherMenuCustomItem vcClass:LauncherShaderPacksViewController.class],
-        [LauncherMenuCustomItem vcClass:AMWorldsViewController.class],
-        [LauncherMenuCustomItem vcClass:AMScreenshotsViewController.class],
-        [LauncherMenuCustomItem vcClass:AMFilesHubViewController.class],
     ].mutableCopy;
     if (realUIIdiom != UIUserInterfaceIdiomTV) {
         [self.options addObject:(id)[LauncherMenuCustomItem

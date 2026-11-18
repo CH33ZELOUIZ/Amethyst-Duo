@@ -413,13 +413,7 @@
                 @"warnKey": @"mem_warn"
             }
         ], @[
-            @{@"icon": @"folder"},
-            @{@"key": @"files", @"title": localize(@"duo.settings.files", nil), @"icon": @"folder",
-              @"type": self.typeChildPane, @"class": AMFilesHubViewController.class, @"canDismissWithSwipe": @YES,
-              @"enableCondition": whenNotInGame},
-            @{@"key": @"screenshots", @"title": localize(@"duo.settings.screenshots", nil), @"icon": @"photo.on.rectangle",
-              @"type": self.typeChildPane, @"class": AMScreenshotsViewController.class, @"canDismissWithSwipe": @YES,
-              @"enableCondition": whenNotInGame},
+            @{@"icon": @"arrow.down.doc"},
             @{@"key": @"browse_packs", @"title": localize(@"duo.settings.browse_packs", nil), @"icon": @"arrow.down.doc",
               @"type": self.typeChildPane, @"class": ModpackInstallViewController.class, @"canDismissWithSwipe": @YES,
               @"enableCondition": whenNotInGame}
