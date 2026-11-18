@@ -175,11 +175,6 @@
     }];
     launch.enabled = pack.directoryExists;
     [sheet addAction:launch];
-    UIAlertAction *files = [UIAlertAction actionWithTitle:localize(@"duo.packs.action.files", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction *a) {
-        [self.navigationController pushViewController:[[AMFileBrowserViewController alloc] initWithPath:pack.absoluteGameDir] animated:YES];
-    }];
-    files.enabled = pack.directoryExists;
-    [sheet addAction:files];
     [sheet addAction:[UIAlertAction actionWithTitle:localize(@"duo.packs.action.remove", nil) style:UIAlertActionStyleDestructive handler:^(UIAlertAction *a) { [self confirmRemove:pack]; }]];
     [sheet addAction:[UIAlertAction actionWithTitle:localize(@"Cancel", nil) style:UIAlertActionStyleCancel handler:nil]];
     [self presentViewController:sheet animated:YES completion:nil];
