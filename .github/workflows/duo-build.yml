@@ -1,5 +1,5 @@
-# Builds an unsigned (ldid fake-signed) IPA with the iOS 27.1+ SDK, publishes a GitHub Release,
-# and regenerates the AltStore/SideStore source at altstore/source.json.
+# Builds an unsigned (ldid fake-signed) IPA with the iOS 27.1+ SDK and publishes a GitHub Release.
+# Does NOT touch altstore/source.json.
 name: Duo build
 on:
   workflow_dispatch:
@@ -25,7 +25,6 @@ jobs:
           V="1.0.${{ github.run_number }}"
           /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $V" Natives/Info.plist
           /usr/libexec/PlistBuddy -c "Set :CFBundleVersion ${{ github.run_number }}" Natives/Info.plist
-          git restore Natives/Info.plist  # prevent dirty tree for later source-only commit
       - name: Build IPA
         run: |
           export PATH="$(brew --prefix)/opt/make/libexec/gnubin:$(brew --prefix)/bin:$PATH"
@@ -39,7 +38,7 @@ jobs:
           echo "APP=$APP"; ls "$APP" | head -30
           BIN="$APP/$(/usr/libexec/PlistBuddy -c 'Print CFBundleExecutable' "$APP/Info.plist")"
           echo "hinge symbol hits:"; strings "$BIN" | grep -c -E "UIHingeInteraction|divisionRegionKind"
-      - name: Publish release + source
+      - name: Publish release (IPA only)
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -56,51 +55,4 @@ jobs:
           else
             gh release create "$TAG" "$NEW" --title "Amethyst Duo build $TAG" --notes "Fold-aware Amethyst for iPhone Duo. Unsigned IPA: sign with SideStore/AltStore." --target "${{ github.sha }}"
           fi
-          URL="https://github.com/${{ github.repository }}/releases/download/$TAG/$(basename $NEW)"
-          VER="1.0.${{ github.run_number }}"
-          DATE=$(date -u +%Y-%m-%d)
-          BID=$(/usr/libexec/PlistBuddy -c 'Print CFBundleIdentifier' "$(ls -d artifacts/Payload/*.app | head -1)/Info.plist" 2>/dev/null || echo org.angelauramc.amethyst)
-          mkdir -p altstore
-          cat > altstore/source.json <<JSON
-          {
-            "name": "CH33ZE Apps",
-            "identifier": "com.ch33ze.source",
-            "apps": [{
-              "name": "Amethyst Duo",
-              "bundleIdentifier": "$BID",
-              "developerName": "CH33ZE (fork of AngelAuraMC)",
-              "subtitle": "Minecraft Java for iPhone Duo",
-              "localizedDescription": "Amethyst with iPhone Duo fold support: game on top and controls on the bottom when half folded, fullscreen when open.",
-              "iconURL": "https://raw.githubusercontent.com/${{ github.repository }}/main/Natives/Assets.xcassets/AppLogo.imageset/AppLogo.png",
-              "tintColor": "7B3FE4",
-              "versions": [{
-                "version": "$VER",
-                "date": "$DATE",
-                "downloadURL": "$URL",
-                "size": $SIZE,
-                "sha256": "$SHA",
-                "minOSVersion": "14.0"
-              }],
-              "appPermissions": {"entitlements": [], "privacy": {}}
-            }],
-            "news": []
-          }
-          JSON
-          sed -i '' 's/^          //' altstore/source.json
-          git config user.name github-actions; git config user.email actions@github.com
-          git restore Natives/Info.plist
-          git add altstore/source.json
-          git commit -m "altstore: $TAG [skip ci]"
-          # Builds take long enough for another commit to commonly land. Rebase this
-          # source-only commit onto the live branch and retry without force-pushing.
-          for attempt in 1 2 3; do
-            git fetch origin main
-            git rebase origin/main
-            if git push origin HEAD:main; then
-              exit 0
-            fi
-            git rebase --abort 2>/dev/null || true
-            sleep "$attempt"
-          done
-          echo "Unable to publish altstore/source.json after concurrent branch updates." >&2
-          exit 1
+          echo "SIZE=$SIZE SHA=$SHA"
